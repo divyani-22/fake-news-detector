@@ -1,0 +1,23 @@
+my_data = [
+    {"text": "India launches first manned mission to Mars, completes round trip in 8 months", "label": "fake"},
+    {"text": "Indian Rupee replaces US Dollar as world's primary reserve currency", "label": "fake"},
+    {"text": "Scientists discover a new continent off the coast of Kerala", "label": "fake"},
+    {"text": "India's Parliament passes law making cricket the only legal sport in the country", "label": "fake"},
+    {"text": "Government announces free electric car for every citizen starting next year", "label": "fake"},
+    {"text": "India becomes first country to establish a permanent human base on the Moon", "label": "fake"},
+    {"text": "New Delhi declared the world's cleanest city by global pollution index", "label": "fake"},
+    {"text": "Indian lab in Bangalore successfully clones a woolly mammoth", "label": "fake"},
+    {"text": "Ganges river declared completely pollution-free after 5-year cleanup", "label": "fake"},
+    {"text": "India builds undersea bridge connecting Mumbai to Dubai", "label": "fake"},
+    {"text": "India's Chandrayaan-3 mission successfully landed near the Moon's south pole in August 2023", "label": "real"},
+    {"text": "India surpassed China to become the world's most populous country in 2023", "label": "real"},
+    {"text": "India won the ICC T20 World Cup in 2024", "label": "real"},
+    {"text": "The Statue of Unity, the world's tallest statue, is located in Gujarat", "label": "real"},
+    {"text": "India commissioned its first indigenous aircraft carrier, INS Vikrant, in 2022", "label": "real"},
+    {"text": "India's UPI (Unified Payments Interface) is one of the largest digital payment systems globally", "label": "real"},
+    {"text": "The Reserve Bank of India is headquartered in Mumbai", "label": "real"},
+    {"text": "The Kumbh Mela is recognized as one of the largest peaceful gatherings of people on Earth", "label": "real"},
+    {"text": "India developed and tested its indigenous light combat aircraft, the Tejas", "label": "real"},
+    {"text": "The Taj Mahal in Agra was completed in the 17th century under Mughal emperor Shah Jahan", "label": "real"},
+
+]

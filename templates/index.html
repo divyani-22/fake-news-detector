@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Verdict — Fake News Detector</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&display=swap');
+
+  :root {
+    --desk: #211d16;
+    --desk-edge: #15120d;
+    --paper: #e9e0c8;
+    --paper-edge: #cdc1a0;
+    --ink: #2b2620;
+    --ink-soft: #5b5240;
+    --gold: #8b6f3e;
+    --stamp-red: #a8362b;
+    --stamp-green: #3f6b4a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    background: radial-gradient(ellipse at top, #2c2719, var(--desk) 60%, var(--desk-edge));
+    font-family: 'Courier Prime', monospace;
+    color: var(--ink);
+  }
+
+  .case-file {
+    position: relative;
+    width: 100%;
+    max-width: 620px;
+    background: var(--paper);
+    background-image:
+      repeating-linear-gradient(transparent 0 31px, rgba(43,38,32,0.06) 31px 32px);
+    border-radius: 2px;
+    padding: 40px 36px 36px;
+    box-shadow:
+      0 1px 0 var(--paper-edge),
+      6px 6px 0 -2px var(--paper-edge),
+      10px 14px 30px rgba(0,0,0,0.45);
+    transform: rotate(-0.4deg);
+  }
+
+  .eyebrow {
+    font-family: 'Special Elite', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    border-bottom: 1px dashed var(--gold);
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    font-family: 'Special Elite', monospace;
+    font-size: clamp(32px, 6vw, 44px);
+    margin: 0 0 6px;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+  }
+
+  .subtitle {
+    margin: 0 0 26px;
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 180px;
+    resize: vertical;
+    background: transparent;
+    border: none;
+    border-top: 1px solid var(--paper-edge);
+    border-bottom: 1px solid var(--paper-edge);
+    font-family: 'Courier Prime', monospace;
+    font-size: 15px;
+    line-height: 32px;
+    color: var(--ink);
+    padding: 6px 2px;
+    outline: none;
+  }
+  textarea::placeholder { color: #a39873; }
+  textarea:focus { border-color: var(--gold); }
+
+  button {
+    margin-top: 22px;
+    font-family: 'Special Elite', monospace;
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 14px 22px;
+    cursor: pointer;
+    border-radius: 1px;
+  }
+  button:hover { background: #44392a; }
+  button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+  .result-area {
+    margin-top: 28px;
+    min-height: 30px;
+  }
+
+  .pending {
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+
+  .verdict-wrap {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+
+  .stamp {
+    font-family: 'Special Elite', monospace;
+    font-size: 26px;
+    letter-spacing: 0.06em;
+    padding: 10px 16px;
+    border: 4px solid currentColor;
+    border-radius: 4px;
+    display: inline-block;
+    transform: rotate(-7deg) scale(0.4);
+    opacity: 0;
+    animation: stampIn 0.35s cubic-bezier(.36,1.8,.4,1) forwards;
+  }
+  .stamp-real { color: var(--stamp-green); }
+  .stamp-fake { color: var(--stamp-red); }
+
+  .note {
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+
+  @keyframes stampIn {
+    to { transform: rotate(-7deg) scale(1); opacity: 0.9; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stamp { animation: none; opacity: 0.9; transform: rotate(-7deg) scale(1); }
+  }
+
+  @media (max-width: 480px) {
+    .case-file { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+  <div class="case-file">
+    <div class="eyebrow">CASE FILE — OPEN INVESTIGATION</div>
+    <h1>THE VERDICT</h1>
+    <p class="subtitle">Paste an article below. We'll render judgment.</p>
+    <textarea id="articleText" placeholder="Paste the article under investigation..."></textarea>
+    <br>
+    <button onclick="checkArticle()">Render Verdict</button>
+    <div id="result" class="result-area"></div>
+  </div>
+
+  <script>
+    async function checkArticle() {
+      const text = document.getElementById("articleText").value;
+      const resultBox = document.getElementById("result");
+      resultBox.innerHTML = '<span class="pending">Reviewing the evidence…</span>';
+
+      const response = await fetch("/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: text })
+      });
+
+      const data = await response.json();
+      const isReal = data.label === "Real";
+
+      resultBox.innerHTML = `
+        <div class="verdict-wrap">
+          <span class="stamp ${isReal ? 'stamp-real' : 'stamp-fake'}">
+            ${isReal ? 'VERIFIED' : 'FAKE'}
+          </span>
+          <span class="note">${data.confidence}% certainty — case closed.</span>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
